@@ -58,9 +58,9 @@ public class MainActivity extends AppCompatActivity {
         } else {
             Snackbar.make(activity_main,"Welcome"+mAuth.getCurrentUser().getEmail(),
                     Snackbar.LENGTH_SHORT).show();
+            //load content
+            displayChatMessage();
         }
-        //load content
-        displayChatMessage();
     }
 
     private void displayChatMessage() {
@@ -72,17 +72,16 @@ public class MainActivity extends AppCompatActivity {
                 .build();
         //adapter = new FirebaseListAdapter<ChatMessage>(this, ChatMessage.class, R.layout.list_item_layout,FirebaseDatabase.getInstance().getReference() ) {
         adapter = new FirebaseListAdapter<ChatMessage>(options ) {
-            @Override
+
             protected void populateView(@NonNull View v, @NonNull ChatMessage model, int position) {
                 TextView messageText, messageUser, messageTime;
-                messageText = findViewById(R.id.message_text);
-                messageUser = findViewById(R.id.message_user);
-                messageTime = findViewById(R.id.message_time);
+                messageText = v.findViewById(R.id.message_text);
+                messageUser = v.findViewById(R.id.message_user);
+                messageTime = v.findViewById(R.id.message_time);
 
                 messageText.setText(model.getMessageText());
                 messageUser.setText(model.getMessageUser());
                 messageTime.setText(DateFormat.getInstance().format(model.getMessagetime()));
-                System.out.println("testing: "+model.getMessageText()+model.getMessageUser()+model.getMessagetime());
             }
         };
         messages.setAdapter(adapter);
@@ -123,5 +122,17 @@ public class MainActivity extends AppCompatActivity {
             });
         }
         return true;
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        adapter.startListening();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        adapter.stopListening();
     }
 }
